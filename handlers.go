@@ -13,6 +13,11 @@ type Todo struct {
 	Completed bool   `json:"completed"`
 }
 
+type TodoUpdate struct {
+	Title     *string `json:"title,omitempty"`
+	Completed *bool   `json:"completed,omitempty"`
+}
+
 func createTodoHandler(w http.ResponseWriter, r *http.Request) {
 	var todo Todo
 	err := json.NewDecoder(r.Body).Decode(&todo)
@@ -63,4 +68,27 @@ func getTodoByIDHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(todo)
 
+}
+
+func updateTodoHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		http.Error(w, "Missing id parameter", http.StatusBadRequest)
+		return
+	}
+
+	var todoUpdate TodoUpdate
+	err := json.NewDecoder(r.Body).Decode(&todoUpdate)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := partialUpdateTodo(id, todoUpdate); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Todo updated successfully")
 }

@@ -62,3 +62,28 @@ func getTodoByID(id int) (Todo, error) {
 	}
 	return todo, nil
 }
+
+func partialUpdateTodo(id string, todoUpdate TodoUpdate) error {
+	// Build the update query dynamically based on provided fields
+	query := "UPDATE todos SET"
+	params := []interface{}{}
+
+	if todoUpdate.Title != nil {
+		query += " title = ?,"
+		params = append(params, *todoUpdate.Title)
+	}
+	if todoUpdate.Completed != nil {
+		query += " completed = ?,"
+		params = append(params, *todoUpdate.Completed)
+	}
+
+	// Remove trailing comma and add WHERE clause
+	if len(params) == 0 {
+		return nil // No fields to update
+	}
+	query = query[:len(query)-1] + " WHERE id = ?"
+	params = append(params, id)
+
+	_, err := db.Exec(query, params...)
+	return err
+}
