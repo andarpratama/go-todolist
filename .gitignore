@@ -1,0 +1,21 @@
+# Ignore binary files
+/bin
+/*.exe
+/*.exe~
+/*.out
+
+# Ignore dependencies
+/vendor/
+
+# Ignore IDE/editor specific files
+*.idea/
+*.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore Go-specific files
+*.test
+*.profile
+
+# Ignore environment files
+.env
